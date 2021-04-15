@@ -29,19 +29,14 @@ public class MovieCatalogResource {
 
     @RequestMapping("/{userId}")
     public List<CatalogItem> getCatalog(@PathVariable("userId") String userId) {
+            UserRating userRating = restTemplate.getForObject("http://ratings-data-service/ratingsdata/user/" + userId, UserRating.class);
 
-// For each movie ID, call movie info service and get details
-        UserRating ratings = restTemplate.getForObject("http://ratings-data-service/ratingsdata/users/" + userId, UserRating.class);
-        return ratings.getUserRating().stream().map(rating -> {
-            Movie movie = restTemplate.getForObject("http://movie-info-service/movies/" + rating.getMovieId(), Movie.class);
-            return new CatalogItem(movie.getName(), "Desc", rating.getRating());
-        })
-                .collect(Collectors.toList());
-    }
+            return userRating.getRatings().stream()
+                    .map(rating -> {
+                        Movie movie = restTemplate.getForObject("http://movie-info-service/movies/" + rating.getMovieId(), Movie.class);
+                        return new CatalogItem(movie.getName(), movie.getDescription(), rating.getRating());
+                    })
+                    .collect(Collectors.toList());
+
+        }
 }
-//            Movie movie = webClientBuilder.build()
-//                    .get()
-//                    .uri("http://localhost:8082/movies/" + rating.getMovieId())
-//                    .retrieve()
-//                    .bodyToMono(Movie.class)
-//                    .block();

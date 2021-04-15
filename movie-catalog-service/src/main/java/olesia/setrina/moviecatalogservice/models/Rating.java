@@ -1,10 +1,12 @@
 package olesia.setrina.moviecatalogservice.models;
 
 public class Rating {
-    String movieId;
-    int rating;
+
+    private String movieId;
+    private int rating;
 
     public Rating() {
+
     }
 
     public Rating(String movieId, int rating) {
